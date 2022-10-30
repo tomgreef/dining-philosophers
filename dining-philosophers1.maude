@@ -1,0 +1,52 @@
+fth NAT* is
+  protecting NAT .
+  op k : -> NzNat .
+endfth
+
+fmod NAT/{k :: NAT*} is
+  sort Nat/{k} .
+  op [_] : Nat -> Nat/{k} .
+  var N : Nat .
+  ceq [N] = [sd(N, k)] if N >= k .
+endfm
+
+fmod DINING-PHILOSOPHERS is
+  *** TODO
+endfm
+
+*** EJEMPLO
+mod MUTEX is
+  sorts Name Mode Proc Token Conf .
+  subsorts Token Proc < Conf .
+  op none : -> Conf [ctor] .
+  op __ : Conf Conf -> Conf [ctor assoc comm id: none] .
+  
+  ops a b : -> Name [ctor] .
+  ops wait critical : -> Mode [ctor] .
+  op [_,_] : Name Mode -> Proc [ctor] .
+  ops * $ : -> Token [ctor] .
+  
+  rl [a-enter] : $ [a, wait] => [a, critical] .
+  rl [b-enter] : * [b, wait] => [b, critical] .
+  rl [a-exit] : [a, critical] => [a, wait] * .
+  rl [b-exit] : [b, critical] => [b, wait] $ .
+endm
+
+load model-checker.maude
+
+mod MUTEX-PREDS is
+  protecting MUTEX .
+  including SATISFACTION .
+  subsort Conf < State .
+  
+  op crit : Name -> Prop .
+  op wait : Name -> Prop .
+  
+  var N : Name .
+  var C : Conf .
+  var P : Prop .
+  
+  eq [N, critical] C |= crit(N) = true .
+  eq [N, wait] C |= wait(N) = true .
+  eq C |= P = false [owise] .
+endm
