@@ -1,0 +1,12 @@
+mod DINING-PHILOSOPHERS{P :: NAT*} is
+    protecting NAT/{P} .
+    sorts Status Philosopher Chopstick Conf .
+    subsorts Philosopher Chopstick < Conf .
+    ops thinking hungry eating : -> Status [ctor] .
+
+    op philosopher : Nat/{P} Status Nat -> Philosopher [ctor] .
+    op chopstick : Nat/{P} -> Chopstick [ctor] .
+
+    op none : -> Conf [ctor] .
+    op __ : Conf Conf -> Conf [ctor assoc comm id: none] .
+endm
