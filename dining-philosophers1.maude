@@ -1,12 +1,344 @@
+fth NAT* is
+    protecting NAT .
+    op k : -> NzNat .
+endfth
+
+fmod NAT/{k :: NAT*} is
+    sort Nat/{k} .
+    op [_] : Nat -> Nat/{k} .
+    var N : Nat .
+    ceq [N] = [sd(N, k)] if N >= k .
+endfm
+
 mod DINING-PHILOSOPHERS{P :: NAT*} is
+    *** Imports
     protecting NAT/{P} .
+
+    *** Sorts
     sorts Status Philosopher Chopstick Conf .
     subsorts Philosopher Chopstick < Conf .
+    
+    *** Basic operations
     ops thinking hungry eating : -> Status [ctor] .
-
     op philosopher : Nat/{P} Status Nat -> Philosopher [ctor] .
     op chopstick : Nat/{P} -> Chopstick [ctor] .
+    op nil : -> Conf [ctor] .
+    op __ : Conf Conf -> Conf [ctor assoc comm id: nil] .
 
-    op none : -> Conf [ctor] .
-    op __ : Conf Conf -> Conf [ctor assoc comm id: none] .
+    *** Vars
+    vars id palillo K t : Nat .
+
+    *** auxInitial
+    op auxInitial : Nat -> Conf .
+    eq auxInitial(0) = nil . 
+    eq auxInitial(s t) = philosopher([t],thinking,0) chopstick([t]) auxInitial(t) .
+
+    *** initial
+    op initial : -> Conf .
+    eq initial = auxInitial(k) .
+
+    *** Rules
+    rl  [get-hungry]    : philosopher([id],thinking,0)                    =>  philosopher([id],hungry,0) .
+    crl [grab-stick]    : philosopher([id],hungry,palillo) chopstick([K]) => philosopher([id],hungry,s(palillo)) 
+        if palillo < 2 and ([id] == [K] or [s(id)] == [K]) .
+    rl  [eat]           : philosopher([id],hungry,2)                      => philosopher([id],eating,2)  .
+    rl  [stop-eating]   : philosopher([id],eating,2)                      => chopstick([id]) philosopher([id],thinking,0) chopstick([s(id)])  .
 endm
+
+view 5 from NAT* to INT is
+    op k to term 5 .
+endv
+
+mod DINING-PHILOSOPHERS-5 is
+    pr DINING-PHILOSOPHERS{5} .
+endm
+
+load model-checker.maude .
+
+mod DINING-PHILOSOPHERS-PREDS{P :: NAT*} is
+    *** Imports
+    pr DINING-PHILOSOPHERS{P} .
+    including SATISFACTION .
+
+    *** Sorts
+    subsort Conf < State .
+
+    *** Basic operations
+    op phil-status : Nat/{P} Status -> Prop .
+    op phil-sticks : Nat/{P} Nat -> Prop .
+
+    *** Vars
+    var M : Nat .
+    var S : Status .
+    var C : Conf .
+    var id : Nat/{P} .
+
+    eq philosopher(id, S, M) C |= phil-status(id, S) = true .
+    eq philosopher(id, S, M) C |= phil-sticks(id, M) = true .
+endm
+
+mod DINING-PHILOSOPHERS-5-CHECK is
+    pr DINING-PHILOSOPHERS-PREDS{5} .
+    including MODEL-CHECKER .
+    including LTL-SIMPLIFIER .
+endm
+eof
+
+[Q1] rew initial .
+
+[Q2] search initial =>* philosopher([0], hungry, 1) philosopher([1], hungry, 1) philosopher([2], hungry, 1) philosopher([3], hungry, 1) philosopher([4], hungry, 1) .
+
+Maude> search initial =>* philosopher([0], hungry, 1) philosopher([1], hungry, 1) philosopher([2], hungry, 1) philosopher([3], hungry, 1) philosopher([4], hungry, 1) .
+search in DINING-PHILOSOPHERS-5-CHECK : initial =>* philosopher([0], hungry, 1) philosopher([1], hungry, 1)
+    philosopher([2], hungry, 1) philosopher([3], hungry, 1) philosopher([4], hungry, 1) .
+
+Solution 1 (state 1987)
+states: 1988  rewrites: 150983 in 171ms cpu (182ms real) (878446 rewrites/second)
+empty substitution
+
+No more solutions.
+states: 2163  rewrites: 166154 in 203ms cpu (218ms real) (817988 rewrites/second)
+
+[Q3] show path 1987 .
+
+Maude> show path 1987 .
+state 0, Conf: 
+chopstick([0]) chopstick([1]) chopstick([2]) chopstick([3]) chopstick([4]) 
+philosopher([0], thinking, 0)
+philosopher([1], thinking, 0) 
+philosopher([2], thinking, 0) 
+philosopher([3], thinking, 0) 
+philosopher([4], thinking, 0)
+===[ rl 
+philosopher([id:Nat], thinking, 0) 
+=> 
+philosopher([id:Nat], hungry, 0) [label get-hungry] . ]===>
+
+state 1, Conf: 
+chopstick([0]) chopstick([1]) chopstick([2]) chopstick([3]) chopstick([4]) 
+philosopher([0], hungry, 0) 
+philosopher([1], thinking, 0) 
+philosopher([2], thinking, 0) 
+philosopher([3], thinking, 0) 
+philosopher([4], thinking, 0)
+===[ crl chopstick([K:Nat]) 
+philosopher([id:Nat], hungry, palillo:Nat) 
+=> 
+philosopher([id:Nat], hungry, s palillo:Nat) if ([id:Nat] == [K:Nat] or [s id:Nat] == [K:Nat]) and palillo:Nat < 2 = true [label grab-stick] . ]===>
+
+state 6, Conf: 
+chopstick([1]) chopstick([2]) chopstick([3]) chopstick([4]) 
+philosopher([0], hungry, 1) 
+philosopher([1], thinking, 0)
+philosopher([2], thinking, 0) 
+philosopher([3], thinking, 0) 
+philosopher([4], thinking, 0)
+===[ rl 
+philosopher([id:Nat], thinking, 0) 
+=> 
+philosopher([id:Nat], hungry, 0) [label get-hungry] . ]===>
+
+state 27, Conf: 
+chopstick([1]) chopstick([2]) chopstick([3]) chopstick([4]) 
+philosopher([0], hungry, 1) 
+philosopher([1], hungry, 0)
+philosopher([2], thinking, 0) 
+philosopher([3], thinking, 0) 
+philosopher([4], thinking, 0)
+===[ crl chopstick([K:Nat]) 
+philosopher([id:Nat], hungry, palillo:Nat) 
+=> 
+philosopher([id:Nat], hungry, s palillo:Nat) if ([id:Nat] == [K:Nat] or [s id:Nat] == [K:Nat]) and palillo:Nat < 2 = true [label grab-stick] . ]===>
+
+state 86, Conf: 
+                chopstick([2]) chopstick([3]) chopstick([4]) 
+philosopher([0], hungry, 1) 
+philosopher([1], hungry, 1) 
+philosopher([2], thinking, 0) 
+philosopher([3], thinking, 0) 
+philosopher([4], thinking, 0)
+===[ rl 
+philosopher([id:Nat], thinking, 0) 
+=> 
+philosopher([id:Nat], hungry, 0) [label get-hungry] . ]===>
+
+state 223, Conf: 
+                chopstick([2]) chopstick([3]) chopstick([4]) 
+philosopher([0], hungry, 1) 
+philosopher([1], hungry, 1) 
+philosopher([2], hungry, 0) 
+philosopher([3], thinking, 0) 
+philosopher([4], thinking, 0)
+===[ crl chopstick([K:Nat]) 
+philosopher([id:Nat], hungry, palillo:Nat) 
+=> 
+philosopher([id:Nat], hungry, s palillo:Nat) if ([id:Nat] == [K:Nat] or [s id:Nat] == [K:Nat]) and palillo:Nat < 2 = true [label grab-stick] . ]===>
+
+state 472, Conf: 
+                                chopstick([3]) chopstick([4]) 
+philosopher([0], hungry, 1) 
+philosopher([1], hungry, 1) 
+philosopher([2], hungry, 1)
+philosopher([3], thinking, 0) 
+philosopher([4], thinking, 0)
+===[ rl 
+philosopher([id:Nat], thinking, 0) 
+=> 
+philosopher([id:Nat], hungry, 0) [label get-hungry] . ]===>
+
+state 844, Conf: 
+                                chopstick([3]) chopstick([4]) 
+philosopher([0], hungry, 1) 
+philosopher([1], hungry, 1) 
+philosopher([2], hungry, 1)
+philosopher([3], hungry, 0) 
+philosopher([4], thinking, 0)
+===[ crl chopstick([K:Nat]) 
+philosopher([id:Nat], hungry, palillo:Nat) 
+=> 
+philosopher([id:Nat], hungry, s palillo:Nat) if ([id:Nat] == [K:Nat] or [s id:Nat] == [K:Nat]) and palillo:Nat < 2 = true [label grab-stick] . ]===>
+
+state 1286, Conf: 
+                                                chopstick([4]) 
+philosopher([0], hungry, 1) 
+philosopher([1], hungry, 1) 
+philosopher([2], hungry, 1) 
+philosopher([3], hungry, 1) 
+philosopher([4], thinking, 0)
+===[ rl 
+philosopher([id:Nat], thinking, 0) 
+=> 
+philosopher([id:Nat], hungry, 0) [label get-hungry] . ]===>
+
+state 1699, Conf: 
+                                                chopstick([4]) 
+philosopher([0], hungry, 1) 
+philosopher([1], hungry, 1) 
+philosopher([2], hungry, 1) 
+philosopher([3], hungry, 1) 
+philosopher([4], hungry, 0)
+===[ crl chopstick([K:Nat]) 
+philosopher([id:Nat], hungry, palillo:Nat) 
+=> 
+philosopher([id:Nat], hungry, s palillo:Nat) if ([id:Nat] == [K:Nat] or [s id:Nat] == [K:Nat]) and palillo:Nat < 2 = true [label grab-stick] . ]===>
+
+state 1987, Conf: 
+
+philosopher([0], hungry, 1) 
+philosopher([1], hungry, 1) 
+philosopher([2], hungry, 1) 
+philosopher([3], hungry, 1)
+philosopher([4], hungry, 1)
+
+show path label 1987 .
+
+Maude> show path label 1987 .
+get-hungry
+grab-stick
+get-hungry
+grab-stick
+get-hungry
+grab-stick
+get-hungry
+grab-stick
+get-hungry
+grab-stick
+
+[Q4] red modelCheck(initial, [] ~ (phil-sticks([0], 1) /\ phil-sticks([1], 1) /\ phil-sticks([2], 1) /\ phil-sticks([3], 1) /\ phil-sticks([4], 1))) .
+
+Maude> red modelCheck(initial, [] ~ (phil-sticks([0], 1) /\ phil-sticks([1], 1) /\ phil-sticks([2], 1) /\ phil-sticks([3], 1) /\ phil-sticks([4], 1))) .
+reduce in DINING-PHILOSOPHERS-5-CHECK : modelCheck(initial, []~ (phil-sticks([4], 1) /\ (phil-sticks([3], 1) /\ (phil-sticks([
+    2], 1) /\ (phil-sticks([0], 1) /\ phil-sticks([1], 1)))))) .
+rewrites: 9020 in 15ms cpu (22ms real) (577280 rewrites/second)
+
+result ModelCheckResult: counterexample
+(
+    *** State 1
+    {chopstick([0]) chopstick([1]) chopstick([2]) chopstick([3]) chopstick([4]) 
+    philosopher([0], thinking, 0) 
+    philosopher([1], thinking, 0) 
+    philosopher([2], thinking, 0) 
+    philosopher([3], thinking, 0) 
+    philosopher([4], thinking, 0),
+    'get-hungry} *** Philosopher 0 hungry
+    
+    *** State 2
+    {chopstick([0]) chopstick([1]) chopstick([2]) chopstick([3]) chopstick([4]) 
+    philosopher([0], hungry, 0)
+    philosopher([1], thinking, 0) 
+    philosopher([2], thinking, 0) 
+    philosopher([3], thinking, 0) 
+    philosopher([4], thinking, 0),
+    'grab-stick} *** Philosopher 0 stick 1
+    
+    *** State 3
+    {               chopstick([1]) chopstick([2]) chopstick([3]) chopstick([4]) 
+    philosopher([0], hungry, 1) 
+    philosopher([1], thinking, 0) 
+    philosopher([2], thinking, 0) 
+    philosopher([3], thinking, 0) 
+    philosopher([4], thinking, 0),
+    'grab-stick} *** Philosopher 0 stick 2
+    
+    *** State 4
+    {                               chopstick([2]) chopstick([3]) chopstick([4]) 
+    philosopher([0], hungry, 2) 
+    philosopher([1], thinking, 0) 
+    philosopher([2], thinking, 0)
+    philosopher([3], thinking, 0) 
+    philosopher([4], thinking, 0),
+    'eat} *** Philosopher 0 eats
+    
+    *** State 5
+    {                               chopstick([2]) chopstick([3]) chopstick([4]) 
+    philosopher([0], eating, 2) 
+    philosopher([1], thinking, 0) 
+    philosopher([2], thinking, 0) 
+    philosopher([3], thinking, 0) 
+    philosopher([4], thinking, 0),
+    'get-hungry} *** Philosopher 2 hungry
+    
+    *** State 6
+    {                               chopstick([2]) chopstick([3]) chopstick([4]) 
+    philosopher([0], eating, 2) 
+    philosopher([1], hungry, 0)
+    philosopher([2], thinking, 0) 
+    philosopher([3], thinking, 0) 
+    philosopher([4], thinking, 0),
+    'grab-stick} *** Philosopher 1 stick 1
+    
+    *** State 7
+    {                                               chopstick([3]) chopstick([4]) 
+    philosopher([0], eating, 2) 
+    philosopher([1], hungry, 1) 
+    philosopher([2], thinking, 0) 
+    philosopher([3], thinking, 0)
+    philosopher([4], thinking, 0),
+    'stop-eating} *** Philosopher 0 stops
+    
+    *** State 8
+    {chopstick([0]) chopstick([1])                   chopstick([3]) chopstick([4]) 
+    philosopher([0], thinking, 0) 
+    philosopher([1], hungry, 1) 
+    philosopher([2], thinking, 0) 
+    philosopher([3], thinking, 0) 
+    philosopher([4], thinking,
+    0),'grab-stick} *** Philosopher 1 stick 2
+    
+    *** State 9
+    {chopstick([0])                                  chopstick([3]) chopstick([4]) 
+    philosopher([0], thinking, 0) 
+    philosopher([1], hungry, 2)
+    philosopher([2], thinking, 0) 
+    philosopher([3], thinking, 0) 
+    philosopher([4], thinking, 0),
+    'get-hungry} *** Philosopher 0 hungry
+    
+    *** State 10
+    {chopstick([0])                                   chopstick([3]) chopstick([4]) 
+    philosopher([0], hungry, 0) 
+    philosopher([1], hungry, 2) 
+    philosopher([2], thinking, 0) 
+    philosopher([3], thinking, 0) 
+    philosopher([4], thinking, 0),
+    'grab-stick} *** Philosopher 0 stick 1
