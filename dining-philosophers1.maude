@@ -22,15 +22,15 @@ mod DINING-PHILOSOPHERS{P :: NAT*} is
     ops thinking hungry eating : -> Status [ctor] .
     op philosopher : Nat/{P} Status Nat -> Philosopher [ctor] .
     op chopstick : Nat/{P} -> Chopstick [ctor] .
-    op nil : -> Conf [ctor] .
-    op __ : Conf Conf -> Conf [ctor assoc comm id: nil] .
+    op none : -> Conf [ctor] .
+    op __ : Conf Conf -> Conf [ctor assoc comm id: none] .
 
     *** Vars
     vars id palillo K t : Nat .
 
     *** auxInitial
     op auxInitial : Nat -> Conf .
-    eq auxInitial(0) = nil . 
+    eq auxInitial(0) = none . 
     eq auxInitial(s t) = philosopher([t],thinking,0) chopstick([t]) auxInitial(t) .
 
     *** initial
