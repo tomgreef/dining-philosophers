@@ -34,8 +34,8 @@ mod DINING-PHILOSOPHERS{P :: NAT*} is
     eq auxInitial(s initial) = philosopher([initial], thinking, 0) chopstick([initial]) auxInitial(initial) .
 
     *** initial
-    op initial : -> Conf .
-    eq initial = auxInitial(k) .
+    op initState : -> Conf .
+    eq initState = auxInitial(k) .
 
     *** Rules
     rl  [get-hungry]    : philosopher([id],thinking,0)                    =>  philosopher([id],hungry,0) .
