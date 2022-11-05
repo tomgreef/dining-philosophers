@@ -42,7 +42,7 @@ mod DINING-PHILOSOPHERS{P :: NAT*} is
     crl [grab-stick]    : philosopher([id],hungry,palillo) chopstick([K]) => philosopher([id],hungry,s(palillo)) 
         if palillo < 2 and ([id] == [K] or [s(id)] == [K]) .
     rl  [eat]           : philosopher([id],hungry,2)                      => philosopher([id],eating,2)  .
-    rl  [stop-eating]   : philosopher([id],eating,2)                      => chopstick([id]) philosopher([id],thinking,0) chopstick([s(id)])  .
+    rl  [think]         : philosopher([id],eating,2)                      => chopstick([id]) philosopher([id],thinking,0) chopstick([s(id)])  .
 endm
 
 view 5 from NAT* to INT is
