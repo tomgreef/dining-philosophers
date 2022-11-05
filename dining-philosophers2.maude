@@ -1,0 +1,89 @@
+fth NAT* is
+    protecting NAT .
+    op k : -> NzNat .
+endfth
+
+fmod NAT/{k :: NAT*} is
+    sort Nat/{k} .
+    op [_] : Nat -> Nat/{k} .
+    var N : Nat .
+    ceq [N] = [sd(N, k)] if N >= k .
+endfm
+
+mod DINING-PHILOSOPHERS{P :: NAT*} is
+    *** Imports
+    protecting NAT/{P} .
+
+    *** Sorts
+    sorts Status Philosopher Chopstick Conf .
+    subsorts Philosopher Chopstick < Conf .
+    
+    *** Basic operations
+    ops thinking hungry eating : -> Status [ctor] .
+    op philosopher : Nat/{P} Status Nat -> Philosopher [ctor] .
+    op chopstick : Nat/{P} -> Chopstick [ctor] .
+    op none : -> Conf [ctor] .
+    op __ : Conf Conf -> Conf [ctor assoc comm id: none] .
+
+    *** Vars
+    vars id palillo K initial : Nat .
+
+    *** auxInitial
+    op auxInitial : Nat -> Conf .
+    eq auxInitial(0) = none . 
+    eq auxInitial(s initial) = philosopher([initial], thinking, 0) chopstick([initial]) auxInitial(initial) .
+
+    *** initial
+    op initState : -> Conf .
+    eq initState = auxInitial(k) .
+
+    *** Rules
+    rl  [get-hungry]    : philosopher([id],thinking,0)              =>  philosopher([id],hungry,0) .
+    crl [grab-stick]    : philosopher([id],hungry,0) chopstick([K]) => philosopher([id],hungry,1) 
+        if ([id] == [K] and [id] < [s id]) or [s(id)] == [K] .
+    crl [grab-stick]    : philosopher([id],hungry,1) chopstick([K]) => philosopher([id],hungry,2) 
+        if ([s id] == [K] and [id] < [s id]) or [id] == [K] .
+    rl  [eat]           : philosopher([id],hungry,2)                => philosopher([id],eating,2)  .
+    rl  [think]         : philosopher([id],eating,2)                => chopstick([id]) philosopher([id],thinking,0) chopstick([s(id)])  .
+endm
+
+view 5 from NAT* to INT is
+    op k to term 5 .
+endv
+
+mod DINING-PHILOSOPHERS-5 is
+    pr DINING-PHILOSOPHERS{5} .
+endm
+
+load model-checker.maude .
+
+mod DINING-PHILOSOPHERS-PREDS{P :: NAT*} is
+    *** Imports
+    pr DINING-PHILOSOPHERS{P} .
+    including SATISFACTION .
+
+    *** Sorts
+    subsort Conf < State .
+
+    *** Basic operations
+    op phil-status : Nat/{P} Status -> Prop .
+    op phil-sticks : Nat/{P} Nat -> Prop .
+
+    *** Vars
+    var M : Nat .
+    var S : Status .
+    var C : Conf .
+    var id : Nat/{P} .
+
+    eq philosopher(id, S, M) C |= phil-status(id, S) = true .
+    eq philosopher(id, S, M) C |= phil-sticks(id, M) = true .
+endm
+
+mod DINING-PHILOSOPHERS-5-CHECK is
+    pr DINING-PHILOSOPHERS-PREDS{5} .
+    including MODEL-CHECKER .
+    including LTL-SIMPLIFIER .
+endm
+eof
+
+[Q6] red modelCheck(initState, [] ~ (phil-sticks([0], 1) /\ phil-sticks([1], 1) /\ phil-sticks([2], 1) /\ phil-sticks([3], 1) /\ phil-sticks([4], 1))) .

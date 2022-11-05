@@ -26,14 +26,14 @@ mod DINING-PHILOSOPHERS{P :: NAT*} is
     op __ : Conf Conf -> Conf [ctor assoc comm id: none] .
 
     *** Vars
-    vars id palillo K initial : Nat .
+    vars id palillo K initState : Nat .
 
     *** auxInitial
     op auxInitial : Nat -> Conf .
     eq auxInitial(0) = none . 
-    eq auxInitial(s initial) = philosopher([initial], thinking, 0) chopstick([initial]) auxInitial(initial) .
+    eq auxInitial(s initState) = philosopher([initState], thinking, 0) chopstick([initState]) auxInitial(initState) .
 
-    *** initial
+    *** initState
     op initState : -> Conf .
     eq initState = auxInitial(k) .
 
@@ -84,12 +84,12 @@ mod DINING-PHILOSOPHERS-5-CHECK is
 endm
 eof
 
-[Q1] rew initial .
+[Q1] rew initState .
 
-[Q2] search initial =>* philosopher([0], hungry, 1) philosopher([1], hungry, 1) philosopher([2], hungry, 1) philosopher([3], hungry, 1) philosopher([4], hungry, 1) .
+[Q2] search initState =>* philosopher([0], hungry, 1) philosopher([1], hungry, 1) philosopher([2], hungry, 1) philosopher([3], hungry, 1) philosopher([4], hungry, 1) .
 
-Maude> search initial =>* philosopher([0], hungry, 1) philosopher([1], hungry, 1) philosopher([2], hungry, 1) philosopher([3], hungry, 1) philosopher([4], hungry, 1) .
-search in DINING-PHILOSOPHERS-5-CHECK : initial =>* philosopher([0], hungry, 1) philosopher([1], hungry, 1)
+Maude> search initState =>* philosopher([0], hungry, 1) philosopher([1], hungry, 1) philosopher([2], hungry, 1) philosopher([3], hungry, 1) philosopher([4], hungry, 1) .
+search in DINING-PHILOSOPHERS-5-CHECK : initState =>* philosopher([0], hungry, 1) philosopher([1], hungry, 1)
     philosopher([2], hungry, 1) philosopher([3], hungry, 1) philosopher([4], hungry, 1) .
 
 Solution 1 (state 1987)
@@ -244,10 +244,10 @@ grab-stick
 get-hungry
 grab-stick
 
-[Q4] red modelCheck(initial, [] ~ (phil-sticks([0], 1) /\ phil-sticks([1], 1) /\ phil-sticks([2], 1) /\ phil-sticks([3], 1) /\ phil-sticks([4], 1))) .
+[Q4] red modelCheck(initState, [] ~ (phil-sticks([0], 1) /\ phil-sticks([1], 1) /\ phil-sticks([2], 1) /\ phil-sticks([3], 1) /\ phil-sticks([4], 1))) .
 
-Maude> red modelCheck(initial, [] ~ (phil-sticks([0], 1) /\ phil-sticks([1], 1) /\ phil-sticks([2], 1) /\ phil-sticks([3], 1) /\ phil-sticks([4], 1))) .
-reduce in DINING-PHILOSOPHERS-5-CHECK : modelCheck(initial, []~ (phil-sticks([4], 1) /\ (phil-sticks([3], 1) /\ (phil-sticks([
+Maude> red modelCheck(initState, [] ~ (phil-sticks([0], 1) /\ phil-sticks([1], 1) /\ phil-sticks([2], 1) /\ phil-sticks([3], 1) /\ phil-sticks([4], 1))) .
+reduce in DINING-PHILOSOPHERS-5-CHECK : modelCheck(initState, []~ (phil-sticks([4], 1) /\ (phil-sticks([3], 1) /\ (phil-sticks([
     2], 1) /\ (phil-sticks([0], 1) /\ phil-sticks([1], 1)))))) .
 rewrites: 9020 in 15ms cpu (22ms real) (577280 rewrites/second)
 
@@ -314,7 +314,7 @@ result ModelCheckResult: counterexample
     philosopher([2], thinking, 0) 
     philosopher([3], thinking, 0)
     philosopher([4], thinking, 0),
-    'stop-eating} *** Philosopher 0 stops
+    'think} *** Philosopher 0 stops
     
     *** State 8
     {chopstick([0]) chopstick([1])                   chopstick([3]) chopstick([4]) 
