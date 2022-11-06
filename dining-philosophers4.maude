@@ -144,3 +144,32 @@ eof
     red modelCheck(initState, (([]<> phil-status([2], hungry)) -> ([] <> phil-status([2],eating)))) .
     red modelCheck(initState, (([]<> phil-status([3], hungry)) -> ([] <> phil-status([3],eating)))) .
     red modelCheck(initState, (([]<> phil-status([4], hungry)) -> ([] <> phil-status([4],eating)))) .
+
+[Q15]
+red modelCheck(initState, [](phil-status([1], hungry) -> <> phil-status([1],eating))) .
+reduce in DINING-PHILOSOPHERS-5-CHECK : modelCheck(initState, [](phil-status([1], hungry) -> <> phil-status([1], eating))) .
+rewrites: 1472 in 0ms cpu (1ms real) (~ rewrites/second)
+result ModelCheckResult: counterexample
+(   
+    *** State 1
+    {[philosopher([0], thinking, 0) philosopher([1], thinking, 0) philosopher([2],thinking, 0) philosopher([3], thinking, 0) philosopher([4], thinking, 0),nil,chopstick([0]) chopstick([1]) chopstick([2]) chopstick([3]) chopstick([4])],'get-hungry} *** Philosopher 0 hungry
+    *** State 2
+    {[philosopher([0], hungry, 0) philosopher([1], thinking,0) philosopher([2], thinking, 0) philosopher([3], thinking, 0) philosopher([4], thinking, 0),nil,chopstick([0]) chopstick([1]) chopstick([2]) chopstick([3]) chopstick([4])],'enqueue} *** Philosopher 0 enqueue
+    *** State 3
+    {[philosopher([0], hungry, 0) philosopher([1], thinking, 0) philosopher([2], thinking, 0) philosopher([3], thinking, 0) philosopher([4], thinking, 0),[0], chopstick([0]) chopstick([1]) chopstick([2]) chopstick([3]) chopstick([4])],'enter} *** Philosopher 0 enter
+    *** State 4
+    {[philosopher([1], thinking, 0) philosopher([2], thinking, 0) philosopher([3], thinking, 0) philosopher([4], thinking, 0),nil,chopstick([0]) chopstick([1]) chopstick([2]) chopstick([3]) chopstick([4]) philosopher([0], hungry, 0)],'grab-stick} *** Philosopher 0 grab stick
+    *** State 5
+    {[philosopher([1], thinking, 0) philosopher([2], thinking, 0) philosopher([3], thinking, 0) philosopher([4], thinking, 0),nil,chopstick([1]) chopstick([2]) chopstick([3]) chopstick([4]) philosopher([0], hungry, 1)],'grab-stick} *** Philosopher 0 grab stick
+    *** State 6
+    {[philosopher([1], thinking, 0) philosopher([2], thinking, 0) philosopher([3], thinking, 0) philosopher([4], thinking, 0),nil,chopstick([2]) chopstick([3]) chopstick([4]) philosopher([0], hungry, 2)], 'get-hungry} *** Philosopher 1 hungry
+    *** State 7
+    {[philosopher([1], hungry, 0) philosopher([2], thinking, 0) philosopher([3], thinking, 0) philosopher([4], thinking, 0),nil,chopstick([2]) chopstick([3]) chopstick([4]) philosopher([0], hungry, 2)],'enqueue} *** Philosopher 1 enqueue
+    *** State 8
+    {[philosopher([1], hungry, 0) philosopher([2], thinking, 0) philosopher([3], thinking, 0) philosopher([4], thinking, 0),[1],chopstick([2]) chopstick([3]) chopstick([4]) philosopher([0], hungry, 2)],'enter} *** Philosopher 1 enter 
+    *** State 9
+    {[philosopher([2], thinking, 0) philosopher([3], thinking, 0) philosopher([4], thinking, 0),nil,chopstick([2]) chopstick([3]) chopstick([4]) philosopher([0], hungry, 2) philosopher([1], hungry, 0)],'grab-stick} *** Philosopher 1 grab strick
+    *** State 10
+    {[philosopher([2], thinking, 0) philosopher([3], thinking, 0) philosopher([4], thinking, 0),nil,chopstick([3]) chopstick([4]) philosopher([0], hungry, 2) philosopher([1], hungry, 1)],'get-hungry} *** Philosopher 2 hungry
+    *** .......
+)
