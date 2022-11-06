@@ -92,7 +92,7 @@ mod DINING-PHILOSOPHERS-PREDS{P :: NAT*} is
     including SATISFACTION .
 
     *** Sorts
-    subsort Conf < State .
+    subsort Conf System < State .
 
     *** Basic operations
     op phil-status : Nat/{P} Status -> Prop .
@@ -115,3 +115,19 @@ mod DINING-PHILOSOPHERS-5-CHECK is
 endm
 eof
 
+[Q12] search initState =>* [none,nil,philosopher([0], hungry, 1) philosopher([1], hungry, 1) philosopher([2], hungry, 1) philosopher([3], hungry, 1) philosopher([4], hungry, 1)] .
+
+[Q13] red modelCheck(initState, [] ~ (phil-sticks([0], 1) /\ phil-sticks([1], 1) /\ phil-sticks([2], 1) /\ phil-sticks([3], 1) /\ phil-sticks([4], 1))) .
+
+[Q14]
+    red modelCheck(initState, [](phil-status([0], hungry) -> <> phil-status([0],eating))) .
+    red modelCheck(initState, [](phil-status([1], hungry) -> <> phil-status([1],eating))) .
+    red modelCheck(initState, [](phil-status([2], hungry) -> <> phil-status([2],eating))) .
+    red modelCheck(initState, [](phil-status([3], hungry) -> <> phil-status([3],eating))) .
+    red modelCheck(initState, [](phil-status([4], hungry) -> <> phil-status([4],eating))) .
+
+    red modelCheck(initState, (([]<> phil-status([0], hungry)) -> ([] <> phil-status([0],eating)))) .
+    red modelCheck(initState, (([]<> phil-status([1], hungry)) -> ([] <> phil-status([1],eating)))) .
+    red modelCheck(initState, (([]<> phil-status([2], hungry)) -> ([] <> phil-status([2],eating)))) .
+    red modelCheck(initState, (([]<> phil-status([3], hungry)) -> ([] <> phil-status([3],eating)))) .
+    red modelCheck(initState, (([]<> phil-status([4], hungry)) -> ([] <> phil-status([4],eating)))) .
