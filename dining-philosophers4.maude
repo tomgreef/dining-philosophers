@@ -58,6 +58,7 @@ mod DINING-PHILOSOPHERS{P :: NAT*} is
     *** count
     op count : Conf -> Nat .
     eq count (none) = 0 .
+    eq count(chopstick([K]) table1) = count(table1) .
     eq count (philosopher table1) = s (count(table1)) .
 
     *** Rules
