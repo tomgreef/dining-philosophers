@@ -29,7 +29,7 @@ mod DINING-PHILOSOPHERS{P :: NAT*} is
     subsorts Philosopher Chopstick < Conf .
     
     *** Basic operations
-    ops thinking hungry eating : -> Status [ctor] .
+    ops thinking hungry eating waiting : -> Status [ctor] .
     op philosopher : Nat/{P} Status Nat -> Philosopher [ctor] .
     op chopstick : Nat/{P} -> Chopstick [ctor] .
     op none : -> Conf [ctor] .
@@ -64,16 +64,16 @@ mod DINING-PHILOSOPHERS{P :: NAT*} is
     rl  [get-hungry] : 
         philosopher([id],thinking,0)                                => philosopher([id],hungry,0) .
     rl  [enqueue]    : 
-        [(philosopher([id],hungry,0) table1),queue,table2]          => [(philosopher([id],hungry,0) table1),([id] queue), table2] .    
+        [(philosopher([id],hungry,0) table1),queue,table2]          => [(philosopher([id],waiting,0) table1),([id] queue), table2] .
     crl  [enter]     :
-        [(philosopher([id],hungry,0) table1),([id] queue), table2]  => [table1,queue,(philosopher([id],hungry,0) table2)] 
-        if count(table2) < 5 . --- CAMBIAR ESTO; DEBERIeA SER DINAMICO con k      
+        [(philosopher([id],waiting,0) table1),([id] queue), table2]  => [table1,queue,(philosopher([id],hungry,0) table2)] 
+        if count(table2) < 1 .
     crl [grab-stick] : 
-        [table1, queue,(philosopher([id],hungry,palillo) table2) chopstick([K])]  => [table1, queue,(philosopher([id],hungry,s(palillo)) table2)]
+        [table1,queue,(philosopher([id],hungry,palillo) table2) chopstick([K])]  => [table1, queue,(philosopher([id],hungry,s(palillo)) table2)]
         if palillo < 2 and ([id] == [K] or [s(id)] == [K]) .
     rl  [eat]        : philosopher([id],hungry,2)                   => philosopher([id],eating,2) .
     rl  [think]      : 
-    [table1,queue,(philosopher([id],eating,2) table2)]              => [(philosopher([id],thinking,2) table1),queue,table2 chopstick([id]) chopstick([s(id)])] .
+    [table1,queue,(philosopher([id],eating,2) table2)]              => [(philosopher([id],thinking,0) table1),queue,table2 chopstick([id]) chopstick([s(id)])] .
 endm
 
 view 5 from NAT* to INT is
@@ -115,7 +115,7 @@ mod DINING-PHILOSOPHERS-5-CHECK is
 endm
 eof
 
-[Q12] search initState =>* [none,nil,philosopher([0], hungry, 1) philosopher([1], hungry, 1) philosopher([2], hungry, 1) philosopher([3], hungry, 1) philosopher([4], hungry, 1)] .
+[Q12] search initState =>* [C:Conf, Q:Queue, philosopher([0],hungry,1) philosopher([1],hungry,1) philosopher([2],hungry,1) philosopher([3],hungry,1) philosopher([4],hungry,1)] .
 
 [Q13] red modelCheck(initState, [] ~ (phil-sticks([0], 1) /\ phil-sticks([1], 1) /\ phil-sticks([2], 1) /\ phil-sticks([3], 1) /\ phil-sticks([4], 1))) .
 
