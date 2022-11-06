@@ -1,3 +1,5 @@
+load model-checker.maude .
+
 fth NAT* is
     protecting NAT .
     op k : -> NzNat .
@@ -6,8 +8,12 @@ endfth
 fmod NAT/{k :: NAT*} is
     sort Nat/{k} .
     op [_] : Nat -> Nat/{k} .
-    var N : Nat .
+    op _>_ : Nat/{k} Nat/{k} -> Bool .
+    op _>=_ : Nat/{k} Nat/{k} -> Bool .
+    var N M : Nat .
     ceq [N] = [sd(N, k)] if N >= k .
+    eq [N] > [M] = N > M .
+    eq [N] >= [M] = N >= M .
 endfm
 
 mod DINING-PHILOSOPHERS{P :: NAT*} is
@@ -38,13 +44,15 @@ mod DINING-PHILOSOPHERS{P :: NAT*} is
     eq initState = auxInitial(k) .
 
     *** Rules
-    rl  [get-hungry]    : philosopher([id],thinking,0)              =>  philosopher([id],hungry,0) .
-    crl [grab-stick]    : philosopher([id],hungry,0) chopstick([K]) => philosopher([id],hungry,1) 
-        if ([id] == [K] and [id] < [s id]) or [s(id)] == [K] .
-    crl [grab-stick]    : philosopher([id],hungry,1) chopstick([K]) => philosopher([id],hungry,2) 
-        if ([s id] == [K] and [id] < [s id]) or [id] == [K] .
-    rl  [eat]           : philosopher([id],hungry,2)                => philosopher([id],eating,2)  .
-    rl  [think]         : philosopher([id],eating,2)                => chopstick([id]) philosopher([id],thinking,0) chopstick([s(id)])  .
+    rl [get-hungry]             : philosopher([id],thinking,0)                                      =>  philosopher([id],hungry,0) .
+    crl [grab-stick-first-1]    : philosopher([id],hungry,0) chopstick([id]) chopstick([s(id)])     =>  philosopher([id],hungry,1) chopstick([s(id)])
+        if not ([id] >= [s(id)]) .
+    crl [grab-stick-first-2]    : philosopher([id],hungry,0) chopstick([id]) chopstick([s(id)])     =>  philosopher([id],hungry,1) chopstick([id])
+        if [id] > [s(id)] .
+    rl [grab-stick-second-1]    : philosopher([id],hungry,1) chopstick([id])                        =>  philosopher([id],hungry,2) .
+    rl [grab-stick-second-2]    : philosopher([id],hungry,1) chopstick([s(id)])                     =>  philosopher([id],hungry,2) .
+    rl [eat]                    : philosopher([id],hungry,2)                                        =>  philosopher([id],eating,2)  .
+    rl [think]                  : philosopher([id],eating,2)                                        => chopstick([id]) philosopher([id],thinking,0) chopstick([s(id)])  .
 endm
 
 view 5 from NAT* to INT is
@@ -86,4 +94,19 @@ mod DINING-PHILOSOPHERS-5-CHECK is
 endm
 eof
 
+[Q5] search initState =>* philosopher([0], hungry, 1) philosopher([1], hungry, 1) philosopher([2], hungry, 1) philosopher([3], hungry, 1) philosopher([4], hungry, 1) .
+
 [Q6] red modelCheck(initState, [] ~ (phil-sticks([0], 1) /\ phil-sticks([1], 1) /\ phil-sticks([2], 1) /\ phil-sticks([3], 1) /\ phil-sticks([4], 1))) .
+
+[Q7]
+    red modelCheck(initState, [](phil-status([0],hungry) -> <> phil-status([0],eating))) .
+    red modelCheck(initState, [](phil-status([1],hungry) -> <> phil-status([1],eating))) .
+    red modelCheck(initState, [](phil-status([2],hungry) -> <> phil-status([2],eating))) .
+    red modelCheck(initState, [](phil-status([3],hungry) -> <> phil-status([3],eating))) .
+    red modelCheck(initState, [](phil-status([4],hungry) -> <> phil-status([4],eating))) .
+
+    red modelCheck(initState, (([]<> phil-status([0],hungry)) -> ([] <> phil-status([0],eating)))) .
+    red modelCheck(initState, (([]<> phil-status([1],hungry)) -> ([] <> phil-status([1],eating)))) .
+    red modelCheck(initState, (([]<> phil-status([2],hungry)) -> ([] <> phil-status([2],eating)))) .
+    red modelCheck(initState, (([]<> phil-status([3],hungry)) -> ([] <> phil-status([3],eating)))) .
+    red modelCheck(initState, (([]<> phil-status([4],hungry)) -> ([] <> phil-status([4],eating)))) .

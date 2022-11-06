@@ -1,3 +1,5 @@
+load model-checker.maude .
+
 fth NAT* is
     protecting NAT .
     op k : -> NzNat .
@@ -6,15 +8,23 @@ endfth
 fmod NAT/{k :: NAT*} is
     sort Nat/{k} .
     op [_] : Nat -> Nat/{k} .
-    var N : Nat .
+    op _>_ : Nat/{k} Nat/{k} -> Bool .
+    op _>=_ : Nat/{k} Nat/{k} -> Bool .
+    var N M : Nat .
     ceq [N] = [sd(N, k)] if N >= k .
+    eq [N] > [M] = N > M .
+    eq [N] >= [M] = N >= M .
 endfm
 
 fmod QUEUE/{P :: NAT*} is
+    *** Imports
     protecting NAT/{P} .
+
+    *** Sorts
     sort Queue .
     subsort Nat/{P} < Queue .
 
+    *** Basic operations
     op nil : -> Queue [ctor] .
     op __ : Queue Queue -> Queue [ctor assoc id: nil] .
 endfm
@@ -34,7 +44,6 @@ mod DINING-PHILOSOPHERS{P :: NAT*} is
     op chopstick : Nat/{P} -> Chopstick [ctor] .
     op none : -> Conf [ctor] .
     op __ : Conf Conf -> Conf [ctor assoc comm id: none] .
-    
     op empty : -> Waiter [ctor] .
     op waiter : Queue Bool -> Waiter [ctor] .
 
