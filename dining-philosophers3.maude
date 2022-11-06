@@ -59,7 +59,7 @@ mod DINING-PHILOSOPHERS{P :: NAT*} is
 
     *** initState
     op initState : -> Conf .
-    eq initState = waiter(nil, false) auxInitial(k) .
+    eq initState = auxInitial(k) .
 
     *** Rules
     rl  [get-hungry]: waiter(queue,someoneEating) philosopher([id],thinking,0)  =>  waiter([id] queue,someoneEating) philosopher([id],hungry,0) .
@@ -110,37 +110,19 @@ eof
 
 [Q8] search initState =>* philosopher([0], hungry, 1) philosopher([1], hungry, 1) philosopher([2], hungry, 1) philosopher([3], hungry, 1) philosopher([4], hungry, 1) .
 
-----------------
-Maude> search initState =>* philosopher([0], hungry, 1) philosopher([1], hungry, 1) philosopher([2], hungry, 1) philosopher([3], hungry, 1) philosopher([4], hungry, 1) .
-search in DINING-PHILOSOPHERS-5-CHECK : initState =>* philosopher([0], hungry, 1)
-    philosopher([1], hungry, 1) philosopher([2], hungry, 1) philosopher([3], hungry, 1) philosopher([4], hungry, 1) .
-
-No solution.
-states: 846  rewrites: 3506 in 0ms cpu (15ms real) (~ rewrites/second)
-----------------
-
 [Q9] red modelCheck(initState, [] ~ (phil-sticks([0], 1) /\ phil-sticks([1], 1) /\ phil-sticks([2], 1) /\ phil-sticks([3], 1) /\ phil-sticks([4], 1))) .
 
-----------------
-Maude> red modelCheck(initState, [] ~ (phil-sticks([0], 1) /\ phil-sticks([1], 1) /\ phil-sticks([2], 1) /\ phil-sticks([3], 1) /\ phil-sticks([4], 1))) .
-reduce in DINING-PHILOSOPHERS-5-CHECK : modelCheck(initState, []~ (phil-sticks([4], 1) /\ (phil-sticks([3], 1)
-    /\ (phil-sticks([2], 1) /\ (phil-sticks([0], 1) /\ phil-sticks([1], 1)))))) .
-rewrites: 3622 in 0ms cpu (21ms real) (~ rewrites/second)
-result Bool: true
-----------------
+[Q10]
+    red modelCheck(initState, [](phil-status([0], hungry) -> <> phil-status([0],eating))) .
+    red modelCheck(initState, [](phil-status([1], hungry) -> <> phil-status([1],eating))) .
+    red modelCheck(initState, [](phil-status([2], hungry) -> <> phil-status([2],eating))) .
+    red modelCheck(initState, [](phil-status([3], hungry) -> <> phil-status([3],eating))) .
+    red modelCheck(initState, [](phil-status([4], hungry) -> <> phil-status([4],eating))) .
 
-[Q10] red modelCheck(initState, (([]<> phil-status([4], hungry)) -> ([] <> phil-status([4],eating)))) .
-----------------
-Maude> red modelCheck(initState, [](phil-status([0], hungry) -> <> phil-status([0],eating))) .
-reduce in DINING-PHILOSOPHERS-5-CHECK : modelCheck(initState, [](phil-status([0], hungry) -> <>
-    phil-status([0], eating))) .
-rewrites: 46 in 0ms cpu (0ms real) (~ rewrites/second)
-----------------
+    red modelCheck(initState, (([]<> phil-status([0], hungry)) -> ([] <> phil-status([0],eating)))) .
+    red modelCheck(initState, (([]<> phil-status([1], hungry)) -> ([] <> phil-status([1],eating)))) .
+    red modelCheck(initState, (([]<> phil-status([2], hungry)) -> ([] <> phil-status([2],eating)))) .
+    red modelCheck(initState, (([]<> phil-status([3], hungry)) -> ([] <> phil-status([3],eating)))) .
+    red modelCheck(initState, (([]<> phil-status([4], hungry)) -> ([] <> phil-status([4],eating)))) .
 
-red modelCheck(initState, [](phil-status([1], hungry) -> <> phil-status([1],eating))) .
-----------------
-Maude> red modelCheck(initState, [](phil-status([1], hungry) -> <> phil-status([1],eating))) .
-reduce in DINING-PHILOSOPHERS-5-CHECK : modelCheck(initState, [](phil-status([1], hungry) -> <> phil-status([1],
-    eating))) .
-rewrites: 46 in 0ms cpu (0ms real) (~ rewrites/second)
-----------------
+[Q11] search initState =>* philosopher([ID1:Nat],eating,2) philosopher([ID2:Nat],eating,2) C:Conf .
