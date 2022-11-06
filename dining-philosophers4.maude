@@ -67,7 +67,7 @@ mod DINING-PHILOSOPHERS{P :: NAT*} is
         [(philosopher([id],hungry,0) table1),queue,table2]          => [(philosopher([id],waiting,0) table1),([id] queue), table2] .
     crl  [enter]     :
         [(philosopher([id],waiting,0) table1),([id] queue), table2]  => [table1,queue,(philosopher([id],hungry,0) table2)] 
-        if count(table2) < 1 .
+        if count(table2) < sd(k,1) .
     crl [grab-stick] : 
         [table1,queue,(philosopher([id],hungry,palillo) table2) chopstick([K])]  => [table1, queue,(philosopher([id],hungry,s(palillo)) table2)]
         if palillo < 2 and ([id] == [K] or [s(id)] == [K]) .
