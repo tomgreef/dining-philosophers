@@ -84,185 +84,20 @@ mod DINING-PHILOSOPHERS-5-CHECK is
 endm
 eof
 
-[Q1] rew initState . --- Infite loop
-reduce initState .
+[Q1] 
+    rew initState . --- Infite loop
+    reduce initState .
 
-----------------
-Maude> reduce initState .
-reduce in DINING-PHILOSOPHERS-5-CHECK : initState .
-rewrites: 12 in 0ms cpu (0ms real) (~ rewrites/second)
-result Conf: chopstick([0]) chopstick([1]) chopstick([2]) chopstick([3]) chopstick([4]) philosopher([0], thinking, 0)
-    philosopher([1], thinking, 0) philosopher([2], thinking, 0) philosopher([3], thinking, 0) philosopher([4],
-    thinking, 0)
-----------------
-
-[Q2] search initState =>* philosopher([0], hungry, 1) philosopher([1], hungry, 1) philosopher([2], hungry, 1) philosopher([3], hungry, 1) philosopher([4], hungry, 1) .
-
-----------------
-Maude> search initState =>* philosopher([0], hungry, 1) philosopher([1], hungry, 1) philosopher([2], hungry, 1) philosopher([3], hungry, 1) philosopher([4], hungry, 1) .
-search in DINING-PHILOSOPHERS-5-CHECK : initState =>* philosopher([0], hungry, 1) philosopher([1], hungry, 1)
-    philosopher([2], hungry, 1) philosopher([3], hungry, 1) philosopher([4], hungry, 1) .
-
-Solution 1 (state 1987)
-states: 1988  rewrites: 150983 in 171ms cpu (182ms real) (878446 rewrites/second)
-empty substitution
-
-No more solutions.
-states: 2163  rewrites: 166154 in 203ms cpu (218ms real) (817988 rewrites/second)
-----------------
-
-show path 1987 .
-
-----------------
-Maude> show path 1987 .
-state 0, Conf: 
-chopstick([0]) chopstick([1]) chopstick([2]) chopstick([3]) chopstick([4]) 
-philosopher([0], thinking, 0)
-philosopher([1], thinking, 0) 
-philosopher([2], thinking, 0) 
-philosopher([3], thinking, 0) 
-philosopher([4], thinking, 0)
-===[ rl 
-philosopher([id:Nat], thinking, 0) 
-=> 
-philosopher([id:Nat], hungry, 0) [label get-hungry] . ]===>
-
-state 1, Conf: 
-chopstick([0]) chopstick([1]) chopstick([2]) chopstick([3]) chopstick([4]) 
-philosopher([0], hungry, 0) 
-philosopher([1], thinking, 0) 
-philosopher([2], thinking, 0) 
-philosopher([3], thinking, 0) 
-philosopher([4], thinking, 0)
-===[ crl chopstick([K:Nat]) 
-philosopher([id:Nat], hungry, palillo:Nat) 
-=> 
-philosopher([id:Nat], hungry, s palillo:Nat) if ([id:Nat] == [K:Nat] or [s id:Nat] == [K:Nat]) and palillo:Nat < 2 = true [label grab-stick] . ]===>
-
-state 6, Conf: 
-chopstick([1]) chopstick([2]) chopstick([3]) chopstick([4]) 
-philosopher([0], hungry, 1) 
-philosopher([1], thinking, 0)
-philosopher([2], thinking, 0) 
-philosopher([3], thinking, 0) 
-philosopher([4], thinking, 0)
-===[ rl 
-philosopher([id:Nat], thinking, 0) 
-=> 
-philosopher([id:Nat], hungry, 0) [label get-hungry] . ]===>
-
-state 27, Conf: 
-chopstick([1]) chopstick([2]) chopstick([3]) chopstick([4]) 
-philosopher([0], hungry, 1) 
-philosopher([1], hungry, 0)
-philosopher([2], thinking, 0) 
-philosopher([3], thinking, 0) 
-philosopher([4], thinking, 0)
-===[ crl chopstick([K:Nat]) 
-philosopher([id:Nat], hungry, palillo:Nat) 
-=> 
-philosopher([id:Nat], hungry, s palillo:Nat) if ([id:Nat] == [K:Nat] or [s id:Nat] == [K:Nat]) and palillo:Nat < 2 = true [label grab-stick] . ]===>
-
-state 86, Conf: 
-                chopstick([2]) chopstick([3]) chopstick([4]) 
-philosopher([0], hungry, 1) 
-philosopher([1], hungry, 1) 
-philosopher([2], thinking, 0) 
-philosopher([3], thinking, 0) 
-philosopher([4], thinking, 0)
-===[ rl 
-philosopher([id:Nat], thinking, 0) 
-=> 
-philosopher([id:Nat], hungry, 0) [label get-hungry] . ]===>
-
-state 223, Conf: 
-                chopstick([2]) chopstick([3]) chopstick([4]) 
-philosopher([0], hungry, 1) 
-philosopher([1], hungry, 1) 
-philosopher([2], hungry, 0) 
-philosopher([3], thinking, 0) 
-philosopher([4], thinking, 0)
-===[ crl chopstick([K:Nat]) 
-philosopher([id:Nat], hungry, palillo:Nat) 
-=> 
-philosopher([id:Nat], hungry, s palillo:Nat) if ([id:Nat] == [K:Nat] or [s id:Nat] == [K:Nat]) and palillo:Nat < 2 = true [label grab-stick] . ]===>
-
-state 472, Conf: 
-                                chopstick([3]) chopstick([4]) 
-philosopher([0], hungry, 1) 
-philosopher([1], hungry, 1) 
-philosopher([2], hungry, 1)
-philosopher([3], thinking, 0) 
-philosopher([4], thinking, 0)
-===[ rl 
-philosopher([id:Nat], thinking, 0) 
-=> 
-philosopher([id:Nat], hungry, 0) [label get-hungry] . ]===>
-
-state 844, Conf: 
-                                chopstick([3]) chopstick([4]) 
-philosopher([0], hungry, 1) 
-philosopher([1], hungry, 1) 
-philosopher([2], hungry, 1)
-philosopher([3], hungry, 0) 
-philosopher([4], thinking, 0)
-===[ crl chopstick([K:Nat]) 
-philosopher([id:Nat], hungry, palillo:Nat) 
-=> 
-philosopher([id:Nat], hungry, s palillo:Nat) if ([id:Nat] == [K:Nat] or [s id:Nat] == [K:Nat]) and palillo:Nat < 2 = true [label grab-stick] . ]===>
-
-state 1286, Conf: 
-                                                chopstick([4]) 
-philosopher([0], hungry, 1) 
-philosopher([1], hungry, 1) 
-philosopher([2], hungry, 1) 
-philosopher([3], hungry, 1) 
-philosopher([4], thinking, 0)
-===[ rl 
-philosopher([id:Nat], thinking, 0) 
-=> 
-philosopher([id:Nat], hungry, 0) [label get-hungry] . ]===>
-
-state 1699, Conf: 
-                                                chopstick([4]) 
-philosopher([0], hungry, 1) 
-philosopher([1], hungry, 1) 
-philosopher([2], hungry, 1) 
-philosopher([3], hungry, 1) 
-philosopher([4], hungry, 0)
-===[ crl chopstick([K:Nat]) 
-philosopher([id:Nat], hungry, palillo:Nat) 
-=> 
-philosopher([id:Nat], hungry, s palillo:Nat) if ([id:Nat] == [K:Nat] or [s id:Nat] == [K:Nat]) and palillo:Nat < 2 = true [label grab-stick] . ]===>
-
-state 1987, Conf: 
-
-philosopher([0], hungry, 1) 
-philosopher([1], hungry, 1) 
-philosopher([2], hungry, 1) 
-philosopher([3], hungry, 1)
-philosopher([4], hungry, 1)
-----------------
-
-show path label 1987 .
-
-----------------
-Maude> show path label 1987 .
-get-hungry
-grab-stick
-get-hungry
-grab-stick
-get-hungry
-grab-stick
-get-hungry
-grab-stick
-get-hungry
-grab-stick
-----------------
+[Q2] 
+    search initState =>* philosopher([0], hungry, 1) philosopher([1], hungry, 1) philosopher([2], hungry, 1) philosopher([3], hungry, 1) philosopher([4], hungry, 1) .
+    
+    show path 1987 .
+    
+    show path label 1987 .
 
 [Q3 & Q4] red modelCheck(initState, [] ~ (phil-sticks([0], 1) /\ phil-sticks([1], 1) /\ phil-sticks([2], 1) /\ phil-sticks([3], 1) /\ phil-sticks([4], 1))) .
 
-----------------
+------- COMMAND ---------
 Maude> red modelCheck(initState, [] ~ (phil-sticks([0], 1) /\ phil-sticks([1], 1) /\ phil-sticks([2], 1) /\ phil-sticks([3], 1) /\ phil-sticks([4], 1))) .
 reduce in DINING-PHILOSOPHERS-5-CHECK : modelCheck(initState, []~ (phil-sticks([4], 1) /\ (phil-sticks([3], 1) /\ (phil-sticks([
     2], 1) /\ (phil-sticks([0], 1) /\ phil-sticks([1], 1)))))) .
@@ -359,4 +194,3 @@ result ModelCheckResult: counterexample
     philosopher([3], thinking, 0) 
     philosopher([4], thinking, 0),
     'grab-stick} *** Philosopher 0 stick 1
-----------------
