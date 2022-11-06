@@ -127,3 +127,15 @@ mod DINING-PHILOSOPHERS-5-CHECK is
     including LTL-SIMPLIFIER .
 endm
 eof
+
+    red modelCheck(initState, [](phil-status([0], hungry) -> <> phil-status([0],eating))) .
+    red modelCheck(initState, [](phil-status([1], hungry) -> <> phil-status([1],eating))) .
+    red modelCheck(initState, [](phil-status([2], hungry) -> <> phil-status([2],eating))) .
+    red modelCheck(initState, [](phil-status([3], hungry) -> <> phil-status([3],eating))) .
+    red modelCheck(initState, [](phil-status([4], hungry) -> <> phil-status([4],eating))) .
+
+    red modelCheck(initState, (([]<> phil-status([0], hungry)) -> ([] <> phil-status([0],eating)))) .
+    red modelCheck(initState, (([]<> phil-status([1], hungry)) -> ([] <> phil-status([1],eating)))) .
+    red modelCheck(initState, (([]<> phil-status([2], hungry)) -> ([] <> phil-status([2],eating)))) .
+    red modelCheck(initState, (([]<> phil-status([3], hungry)) -> ([] <> phil-status([3],eating)))) .
+    red modelCheck(initState, (([]<> phil-status([4], hungry)) -> ([] <> phil-status([4],eating)))) .
