@@ -33,8 +33,8 @@ mod DINING-PHILOSOPHERS{P :: NAT*} is
     protecting QUEUE/{P} .
 
     *** Sorts
-    sorts Status Philosopher Chopstick Conf System .
-    subsorts Philosopher Chopstick < Conf .
+    sorts Waiter Status Philosopher Chopstick Conf System .
+    subsorts Waiter Philosopher Chopstick < Conf .
     
     *** Basic operations
     ops thinking hungry eating : -> Status [ctor] .
@@ -43,12 +43,15 @@ mod DINING-PHILOSOPHERS{P :: NAT*} is
     op none : -> Conf [ctor] .
     op __ : Conf Conf -> Conf [ctor assoc comm id: none] .
     op [_,_,_] : Conf Queue Conf -> System .
+    op empty : -> Waiter [ctor] .
+    op waiter : Queue Bool -> Waiter [ctor] .
 
     *** Vars
     vars id palillo K initState : Nat .
     var queue : Queue .
     vars table1 table2 : Conf .
     var philosopher : Philosopher .
+    var someoneEating : Bool .
 
     *** auxInitial
     op auxPhilosopher : Nat -> Conf .
@@ -70,8 +73,7 @@ mod DINING-PHILOSOPHERS{P :: NAT*} is
     eq count (philosopher table1) = s (count(table1)) .
 
     *** Rules
-    rl  [get-hungry] : 
-        philosopher([id],thinking,0)                                => philosopher([id],hungry,0) .
+    rl  [get-hungry] : waiter(queue,someoneEating) philosopher([id],thinking,0) => waiter([id] queue,someoneEating) philosopher([id],hungry,0) .
     crl  [enqueue]    : 
         [(philosopher([id],hungry,0) table1),queue,table2]          => [(philosopher([id],hungry,0) table1),([id] queue), table2] 
         if not id isIn queue .
@@ -79,11 +81,11 @@ mod DINING-PHILOSOPHERS{P :: NAT*} is
         [(philosopher([id],hungry,0) table1),([id] queue), table2] => [table1,queue,(philosopher([id],hungry,0) table2)] 
         if count(table2) < sd(k,1) .
     crl [grab-stick] : 
-        [table1,queue,(philosopher([id],hungry,palillo) table2) chopstick([K])] => [table1, queue,(philosopher([id],hungry,s(palillo)) table2)]
+        [table1,queue,waiter ([id] queue,true) philosopher([id],hungry,palillo) table2 chopstick([K])] => [table1, queue,waiter ([id] queue,false) philosopher([id],hungry,s(palillo)) table2]
         if palillo < 2 and ([id] == [K] or [s(id)] == [K]) .
     rl  [eat]        : philosopher([id],hungry,2)                   => philosopher([id],eating,2) .
     rl  [think]      : 
-    [table1,queue,(philosopher([id],eating,2) table2)]              => [(philosopher([id],thinking,0) table1),queue,table2 chopstick([id]) chopstick([s(id)])] .
+    [table1,queue,waiter ([id] queue,false)philosopher([id],eating,2) table2]              => [waiter ([id] queue,true) philosopher([id],thinking,0) table1,queue,table2 chopstick([id]) chopstick([s(id)])] .
 endm
 
 view 5 from NAT* to INT is
