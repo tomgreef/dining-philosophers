@@ -17,6 +17,14 @@ fmod QUEUE/{P :: NAT*} is
 
     op nil : -> Queue [ctor] .
     op __ : Queue Queue -> Queue [ctor assoc id: nil] .
+
+    var queue : Queue .
+    var id id' : Nat .
+
+    op _isIn_ : Nat Queue -> Bool .
+    eq id isIn nil = false .
+    ceq id isIn ([id'] queue) = true if id = id' .
+    eq id isIn ([id'] queue) = id isIn queue .
 endfm
 
 mod DINING-PHILOSOPHERS{P :: NAT*} is
@@ -29,7 +37,7 @@ mod DINING-PHILOSOPHERS{P :: NAT*} is
     subsorts Philosopher Chopstick < Conf .
     
     *** Basic operations
-    ops thinking hungry eating waiting : -> Status [ctor] .
+    ops thinking hungry eating : -> Status [ctor] .
     op philosopher : Nat/{P} Status Nat -> Philosopher [ctor] .
     op chopstick : Nat/{P} -> Chopstick [ctor] .
     op none : -> Conf [ctor] .
@@ -64,13 +72,14 @@ mod DINING-PHILOSOPHERS{P :: NAT*} is
     *** Rules
     rl  [get-hungry] : 
         philosopher([id],thinking,0)                                => philosopher([id],hungry,0) .
-    rl  [enqueue]    : 
-        [(philosopher([id],hungry,0) table1),queue,table2]          => [(philosopher([id],waiting,0) table1),([id] queue), table2] .
+    crl  [enqueue]    : 
+        [(philosopher([id],hungry,0) table1),queue,table2]          => [(philosopher([id],hungry,0) table1),([id] queue), table2] 
+        if not id isIn queue .
     crl  [enter]     :
-        [(philosopher([id],waiting,0) table1),([id] queue), table2]  => [table1,queue,(philosopher([id],hungry,0) table2)] 
+        [(philosopher([id],hungry,0) table1),([id] queue), table2] => [table1,queue,(philosopher([id],hungry,0) table2)] 
         if count(table2) < sd(k,1) .
     crl [grab-stick] : 
-        [table1,queue,(philosopher([id],hungry,palillo) table2) chopstick([K])]  => [table1, queue,(philosopher([id],hungry,s(palillo)) table2)]
+        [table1,queue,(philosopher([id],hungry,palillo) table2) chopstick([K])] => [table1, queue,(philosopher([id],hungry,s(palillo)) table2)]
         if palillo < 2 and ([id] == [K] or [s(id)] == [K]) .
     rl  [eat]        : philosopher([id],hungry,2)                   => philosopher([id],eating,2) .
     rl  [think]      : 
@@ -93,7 +102,7 @@ mod DINING-PHILOSOPHERS-PREDS{P :: NAT*} is
     including SATISFACTION .
 
     *** Sorts
-    subsort Conf System < State .
+    subsort System < State .
 
     *** Basic operations
     op phil-status : Nat/{P} Status -> Prop .
@@ -102,11 +111,14 @@ mod DINING-PHILOSOPHERS-PREDS{P :: NAT*} is
     *** Vars
     var M : Nat .
     var S : Status .
-    var C : Conf .
-    var id : Nat/{P} .
+    var Q : Queue .
+    var C C' : Conf .
+    var ID : Nat/{P} .
 
-    eq philosopher(id, S, M) C |= phil-status(id, S) = true .
-    eq philosopher(id, S, M) C |= phil-sticks(id, M) = true .
+    eq [C,Q, philosopher(ID, S, M) C'] |= phil-status(ID, S) = true .
+    eq [philosopher(ID, S, M) C,Q, C'] |= phil-status(ID, S) = true .
+    eq [C,Q, philosopher(ID, S, M) C'] |= phil-sticks(ID, M) = true .
+    eq [philosopher(ID, S, M) C,Q, C'] |= phil-sticks(ID, M) = true .
 endm
 
 mod DINING-PHILOSOPHERS-5-CHECK is
