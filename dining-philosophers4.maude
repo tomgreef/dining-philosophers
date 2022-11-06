@@ -73,7 +73,7 @@ mod DINING-PHILOSOPHERS{P :: NAT*} is
     rl  [get-hungry] : 
         philosopher([id],thinking,0)                                => philosopher([id],hungry,0) .
     crl  [enqueue]    : 
-        [(philosopher([id],hungry,0) table1),queue,table2]          => [(philosopher([id],hungry,0) table1),([id] queue), table2] 
+        [(philosopher([id],hungry,0) table1),queue,table2]          => [(philosopher([id],hungry,0) table1),(queue [id]), table2] 
         if not id isIn queue .
     crl  [enter]     :
         [(philosopher([id],hungry,0) table1),([id] queue), table2] => [table1,queue,(philosopher([id],hungry,0) table2)] 
