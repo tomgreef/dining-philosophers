@@ -121,3 +121,17 @@ result Bool: true
 ----------------
 
 [Q10] red modelCheck(initState, (([]<> phil-status([4], hungry)) -> ([] <> phil-status([4],eating)))) .
+----------------
+Maude> red modelCheck(initState, [](phil-status([0], hungry) -> <> phil-status([0],eating))) .
+reduce in DINING-PHILOSOPHERS-5-CHECK : modelCheck(initState, [](phil-status([0], hungry) -> <>
+    phil-status([0], eating))) .
+rewrites: 46 in 0ms cpu (0ms real) (~ rewrites/second)
+----------------
+
+red modelCheck(initState, [](phil-status([1], hungry) -> <> phil-status([1],eating))) .
+----------------
+Maude> red modelCheck(initState, [](phil-status([1], hungry) -> <> phil-status([1],eating))) .
+reduce in DINING-PHILOSOPHERS-5-CHECK : modelCheck(initState, [](phil-status([1], hungry) -> <> phil-status([1],
+    eating))) .
+rewrites: 46 in 0ms cpu (0ms real) (~ rewrites/second)
+----------------
