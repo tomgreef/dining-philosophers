@@ -24,7 +24,7 @@ fmod QUEUE/{P :: NAT*} is
     op _isIn_ : Nat Queue -> Bool .
     eq id isIn nil = false .
     ceq id isIn ([id'] queue) = true if id = id' .
-    eq id isIn ([id'] queue) = id isIn queue .
+    eq id isIn ([id'] queue) = id isIn queue [owise] .
 endfm
 
 mod DINING-PHILOSOPHERS{P :: NAT*} is
